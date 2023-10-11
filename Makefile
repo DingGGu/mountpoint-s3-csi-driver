@@ -28,6 +28,7 @@ GOBIN=$(shell pwd)/bin
 
 REGISTRY?=151381207180.dkr.ecr.eu-west-1.amazonaws.com
 IMAGE?=$(REGISTRY)/s3-csi-driver
+SIDECAR_IMAGE?=$(REGISTRY)/s3-csi-driver-sidecar
 TAG?=$(GIT_COMMIT)
 
 PLATFORM?=linux/amd64,linux/arm64
@@ -41,6 +42,14 @@ build_image:
 .PHONY: push_image
 push_image:
 	docker push ${IMAGE}:${TAG}
+
+.PHONY: build_sidecar
+build_sidecar:
+	docker build -t=${SIDECAR_IMAGE}:${TAG} -f Dockerfile.sidecar .
+
+.PHONY: push_sidecar
+push_sidecar:
+	docker push ${SIDECAR_IMAGE}:${TAG}
 
 .PHONY: login_registry
 login_registry:

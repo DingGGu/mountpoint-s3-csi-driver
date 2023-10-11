@@ -52,7 +52,7 @@ func (d *Driver) NodePublishVolume(ctx context.Context, req *csi.NodePublishVolu
 		return nil, status.Error(codes.InvalidArgument, "Volume ID not provided")
 	}
 
-	source := volumeID
+	// source := volumeID
 
 	target := req.GetTargetPath()
 	if len(target) == 0 {
@@ -75,7 +75,7 @@ func (d *Driver) NodePublishVolume(ctx context.Context, req *csi.NodePublishVolu
 	}
 
 	klog.V(5).Infof("NodePublishVolume: creating dir %s", target)
-	if err := d.mounter.MakeDir(target); err != nil {
+	if err := d.mounter.MakeDir(target); err != nil { // not working wtf?
 		return nil, status.Errorf(codes.Internal, "Could not create dir %q: %v", target, err)
 	}
 
@@ -101,12 +101,7 @@ func (d *Driver) NodePublishVolume(ctx context.Context, req *csi.NodePublishVolu
 		return nil, status.Errorf(codes.Internal, "Could not check if %q is mounted: %v", target, err)
 	}
 	if !mounted {
-		klog.V(5).Infof("NodePublishVolume: mounting %s at %s with options %v", source, target, mountpointArgs)
-		if err := d.mounter.Mount(source, target, fstype, mountpointArgs); err != nil {
-			os.Remove(target)
-			return nil, status.Errorf(codes.Internal, "Could not mount %q at %q: %v", source, target, err)
-		}
-		klog.V(5).Infof("NodePublishVolume: %s was mounted", target)
+		return nil, status.Errorf(codes.Internal, "Path %q is not mounted yet", target)
 	}
 
 	return &csi.NodePublishVolumeResponse{}, nil
