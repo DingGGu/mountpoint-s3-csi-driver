@@ -1,3 +1,10 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: s3-sidecar-high-priority-nonpreempting
+value: 1000000000 # sidecar has the highest possible user-defined priority (may be evicted by system-cluster-critical (2000000000), system-node-critical (2000001000)), it will free up resources shortly after user pod was evicted from the node
+preemptionPolicy: Never # new sidecar won't preempt already running pods
+globalDefault: false
 ---
 apiVersion: v1
 kind: Pod
@@ -5,7 +12,7 @@ metadata:
   name: s3-sidecar-podid-volumeid
   namespace: kube-system # must be the same as for serviceAccount
 spec:
-  priorityClassName: system-node-critical # sidecar has the same chances to be evicted as the driver itself
+  priorityClassName: s3-sidecar-high-priority-nonpreempting
   nodeName: ip-192-168-15-75.eu-west-1.compute.internal # or ip-192-168-91-88.eu-west-1.compute.internal
   restartPolicy: Never
   serviceAccountName: s3-csi-driver-sa
