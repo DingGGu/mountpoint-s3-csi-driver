@@ -14,7 +14,7 @@ spec:
     driver: s3.csi.aws.com # required
     volumeHandle: s3-csi-driver-volume
     volumeAttributes:
-      bucketName: s3-csi-driver
+      bucketName: s3-csi-driver-test-jjk
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -34,9 +34,10 @@ kind: Pod
 metadata:
   name: s3-app
 spec:
+  serviceAccountName: jk-test-sa
   containers:
     - name: app
-      image: centos
+      image: public.ecr.aws/amazonlinux/amazonlinux:2023
       command: ["/bin/sh"]
       args: ["-c", "echo 'Hello from the container!' >> /data/$(date -u).txt; tail -f /dev/null"]
       volumeMounts:

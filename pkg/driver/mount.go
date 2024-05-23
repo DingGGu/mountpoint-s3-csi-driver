@@ -33,28 +33,32 @@ import (
 )
 
 const (
-	keyIdEnv             = "AWS_ACCESS_KEY_ID"
-	accessKeyEnv         = "AWS_SECRET_ACCESS_KEY"
-	regionEnv            = "AWS_REGION"
-	defaultRegionEnv     = "AWS_DEFAULT_REGION"
-	stsEndpointsEnv      = "AWS_STS_REGIONAL_ENDPOINTS"
-	MountS3PathEnv       = "MOUNT_S3_PATH"
-	awsMaxAttemptsEnv    = "AWS_MAX_ATTEMPTS"
-	defaultMountS3Path   = "/usr/bin/mount-s3"
-	procMounts           = "/host/proc/mounts"
-	userAgentPrefix      = "--user-agent-prefix"
-	awsMaxAttemptsOption = "--aws-max-attempts"
-	csiDriverPrefix      = "s3-csi-driver/"
+	keyIdEnv                   = "AWS_ACCESS_KEY_ID"
+	accessKeyEnv               = "AWS_SECRET_ACCESS_KEY"
+	regionEnv                  = "AWS_REGION"
+	defaultRegionEnv           = "AWS_DEFAULT_REGION"
+	stsEndpointsEnv            = "AWS_STS_REGIONAL_ENDPOINTS"
+	MountS3PathEnv             = "MOUNT_S3_PATH"
+	awsMaxAttemptsEnv          = "AWS_MAX_ATTEMPTS"
+	defaultMountS3Path         = "/usr/bin/mount-s3"
+	procMounts                 = "/host/proc/mounts"
+	userAgentPrefix            = "--user-agent-prefix"
+	awsMaxAttemptsOption       = "--aws-max-attempts"
+	csiDriverPrefix            = "s3-csi-driver/"
+	containerAuthTokenEnv      = "AWS_CONTAINER_AUTHORIZATION_TOKEN"
+	containerCredentialsUriEnv = "AWS_CONTAINER_CREDENTIALS_FULL_URI"
 )
 
 type MountCredentials struct {
-	AccessKeyID     string
-	SecretAccessKey string
-	Region          string
-	DefaultRegion   string
-	WebTokenPath    string
-	StsEndpoints    string
-	AwsRoleArn      string
+	AccessKeyID             string
+	SecretAccessKey         string
+	Region                  string
+	DefaultRegion           string
+	WebTokenPath            string
+	StsEndpoints            string
+	AwsRoleArn              string
+	ContainerAuthToken      string
+	ContainerCredentialsUri string
 }
 
 // Get environment variables to pass to mount-s3 for authentication.
@@ -77,6 +81,10 @@ func (mc *MountCredentials) Env() []string {
 	}
 	if mc.StsEndpoints != "" {
 		env = append(env, stsEndpointsEnv+"="+mc.StsEndpoints)
+	}
+	if mc.ContainerAuthToken != "" {
+		env = append(env, containerAuthTokenEnv+"="+mc.ContainerAuthToken)
+		env = append(env, containerCredentialsUriEnv+"="+mc.ContainerCredentialsUri)
 	}
 
 	return env
@@ -253,6 +261,8 @@ func (m *S3Mounter) Mount(bucketName string, target string,
 		env = append(env, strings.Replace(options[maxAttemptsIdx], awsMaxAttemptsOption, awsMaxAttemptsEnv, 1))
 		options = append(options[:maxAttemptsIdx], options[maxAttemptsIdx+1:]...)
 	}
+
+	klog.V(4).Infof("JJK env: %v", env)
 
 	output, err := m.Runner.StartService(timeoutCtx, &system.ExecConfig{
 		Name:        "mount-s3-" + m.MpVersion + "-" + uuid.New().String() + ".service",

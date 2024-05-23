@@ -47,7 +47,7 @@ spec:
       containers:
         - name: s3-plugin
           securityContext:
-            privileged: false
+            privileged: true
             seLinuxOptions:
               user: system_u
               type: super_t
@@ -85,6 +85,8 @@ spec:
                   fieldPath: spec.nodeName
             - name: HOST_PLUGIN_DIR
               value: /var/lib/kubelet/plugins/s3.csi.aws.com/
+            - name: USE_POD_IDENTITY # Will use the pod's service account IAM role to authenticate to S3 when true
+              value: 'true'
           volumeMounts:
             - name: kubelet-dir
               mountPath: /var/lib/kubelet
