@@ -150,6 +150,7 @@ func (ns *S3NodeServer) NodePublishVolume(ctx context.Context, req *csi.NodePubl
 			if stsToken != nil {
 				klog.V(4).Infof("NodePublishVolume: stsToken exp: %v", stsToken.ExpirationTimestamp)
 				hostTokenPath = path.Join(hostPluginDir, volumeID+".token")
+				// TODO cleanup these files on unmount and startup
 				os.WriteFile(path.Join("/csi/", volumeID+".token"), []byte(stsToken.Token), 0400)
 			}
 
@@ -183,12 +184,6 @@ func (ns *S3NodeServer) NodePublishVolume(ctx context.Context, req *csi.NodePubl
 	klog.V(4).Infof("JJK roleArn: %s", awsRoleArn)
 
 	klog.V(4).Infof("NodePublishVolume: mounting %s at %s with options %v", bucket, target, mountpointArgs)
-	hostPluginDir := os.Getenv(hostPluginDirEnv)
-	if hostPluginDir == "" {
-		// set the default in case the env variable isn't found
-		hostPluginDir = "/var/lib/kubelet/plugins/s3.csi.aws.com/"
-	}
-	hostTokenPath := path.Join(hostPluginDir, "token")
 	credentials := &MountCredentials{
 		AccessKeyID:             os.Getenv(keyIdEnv),
 		SecretAccessKey:         os.Getenv(accessKeyEnv),
