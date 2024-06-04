@@ -47,6 +47,7 @@ spec:
       containers:
         - name: s3-plugin
           securityContext:
+            # TODO privileged should be false
             privileged: true
             seLinuxOptions:
               user: system_u

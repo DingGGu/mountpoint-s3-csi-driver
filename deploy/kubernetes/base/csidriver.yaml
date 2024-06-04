@@ -6,7 +6,7 @@ metadata:
   name: s3.csi.aws.com
 spec:
   attachRequired: false
-  # TODO JJK make sure this matches helm
+  # TODO JJK make sure this matches helm and OPT IN
   storageCapacity: false
   podInfoOnMount: true
   tokenRequests:
