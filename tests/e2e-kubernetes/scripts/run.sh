@@ -31,7 +31,7 @@ SELINUX_MODE=${SELINUX_MODE:-}
 
 # We don't actually create clusters with eksctl as part of our GitHub workflow, we run our tests on pre-existing clusters.
 # Therefore, we need to make sure we're setting correct cluster names here.
-if [[ "${CLUSTER_TYPE}" == "eksctl"]]; then
+if [[ "${CLUSTER_TYPE}" == "eksctl" ]]; then
     if [[ "${AMI_FAMILY}" == "Bottlerocket" ]]; then
         CLUSTER_NAME="s3-csi-cluster-bottlerocket"
     elif [[ "${ARCH}" == "arm" ]]; then
