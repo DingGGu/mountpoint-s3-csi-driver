@@ -98,7 +98,7 @@ jobs:
             seLinuxMode: "enforcing"
     # TODO: This is temporary, we wanted to run our tests on SELinux enforced hosts even before we support it.
     #       Our tests will be passing on SELinux enforced hosts as well once we support it and we will remove this configuration.
-    continue-on-error: ${{ matrix.seLinuxMode == "enforcing" }}
+    continue-on-error: ${{ matrix.seLinuxMode == 'enforcing' }}
     runs-on: ubuntu-latest
     permissions:
       id-token: write
