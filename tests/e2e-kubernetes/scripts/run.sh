@@ -42,7 +42,8 @@ if [[ "${CLUSTER_TYPE}" == "eksctl" ]]; then
 else
     # In kops, cluster names must end with ".k8s.local" to use Gossip DNS.
     # See https://kops.sigs.k8s.io/gossip/#configuring-a-cluster-to-use-gossip
-    CLUSTER_NAME="s3-csi-cluster-${CLUSTER_TYPE}-${AMI_FAMILY}-${ARCH}.k8s.local"
+    # They also need to be valid domain names, that's why we're lowercasing "AMI_FAMILY".
+    CLUSTER_NAME="s3-csi-cluster-${CLUSTER_TYPE}-${AMI_FAMILY,,}-${ARCH}.k8s.local"
 fi
 
 KUBECONFIG=${KUBECONFIG:-"${TEST_DIR}/${CLUSTER_NAME}.kubeconfig"}
